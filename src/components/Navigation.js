@@ -14,8 +14,7 @@ export default function Navigation() {
         ></i>
         <Link
           class="navbar-brand m-0"
-          to=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html "
-          target="_blank"
+          to="/"
         >
           <img
             src="./assets/img/logo-ct-dark.png"

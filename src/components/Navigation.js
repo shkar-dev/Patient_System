@@ -56,6 +56,19 @@ export default function Navigation() {
           </li>
 
           <li class="nav-item">
+            <Link class="nav-link" to="/PatientList">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="fa fa-list text-dark text-sm opacity-10"
+                ></i>
+              </div>
+
+              <span class="nav-link-text ms-1">  Patient List</span>
+            </Link>
+          </li>
+          <li class="nav-item">
             <Link class="nav-link" to="/TodaysPatient">
               <div
                 class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"

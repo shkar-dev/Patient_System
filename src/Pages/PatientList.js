@@ -1,28 +1,17 @@
-import "./style/TodaysPatient.css";
-import { useEffect, useState } from "react";
-import { collection, onSnapshot, QuerySnapshot } from "firebase/firestore";
-import axios from "axios";
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 
-function TodaysPatient() {
-  const [Patients, setPatient] = useState([]);
-  // firebase fetch data 
-  // useEffect(
-  //   () =>
-  //     onSnapshot(collection(db, "Patients"), (snapshot) => {
-  //       setPatient(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-  //     }),
-  //   []
-  // );
-
-  useEffect(()=>{
-    axios.get("http://localhost:85/patient_system/project/patient_system_backend/FetchTodaysPatients.php").then((res)=>{
-       setPatient(res.data);
-    });
-  }, [] )
-
-  let increment = 1;
-
+function PatientList() {
+    const [Patients , setPatient] = useState([]);
+    var increment =1;
+    useEffect(()=>{
+        axios.get("http://localhost:85/patient_system/project/patient_system_backend/FetchPatients.php").then((res)=>{
+            console.log(res.data);
+            setPatient(res.data);
+        })
+    }, [] )
   return (
+   <>
     <div className="formContainer">
       <div className="card ">
         <div className="card-header bg-white border-bottom  ">
@@ -76,7 +65,8 @@ function TodaysPatient() {
         </div>
       </div>
     </div>
-  );
+   </>
+  )
 }
 
-export default TodaysPatient;
+export default PatientList

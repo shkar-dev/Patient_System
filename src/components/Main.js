@@ -10,6 +10,7 @@ import Register from './../Pages/Register';
 import Search from './../Pages/Search';
 import TodaysPatient from '../Pages/TodaysPatient';
 import PatientList from '../Pages/PatientList';
+import Details from '../Pages/Details';
  
 
 function Main() {
@@ -25,6 +26,7 @@ function Main() {
             <Route path="/Search" element={<Search/>} />
             <Route path="/TodaysPatient" element={<TodaysPatient/>} />   
             <Route path="/PatientList" element={<PatientList/>} />   
+            <Route path='/Details/:id' element={<Details/>} />
         </Routes>
         <Footer/>
     </main> 

@@ -7,6 +7,7 @@ import db from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 toast.configure();
 
@@ -711,7 +712,9 @@ export default function NewPatient() {
           </div>
           <div className="card-footer">
             <Button title="Save" type="submit" icon="fa fa-check" />
-            <Button title="Clear All" icon="fa fa-eraser" type="reset" />
+            <Link to="/PatientList" className="btn btn-outline-dark mx-2">
+              Back to List <i className="fa fa-list mx-2"></i>
+            </Link>
           </div>
         </form>
       </div>

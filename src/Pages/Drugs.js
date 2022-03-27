@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Modal from "../UI/Modal";
 import "./style/Drugs.css";
 
 function Drugs() {
@@ -15,9 +16,9 @@ function Drugs() {
     Generic: "",
     Trade: "",
   });
-
-   
-
+  const [drugId, setDrugId]=  useState({
+    Id : null
+  })
   const [FetchedDrug , setFetchedDrug] = useState([]);
   const [IsFormValid, setIsFormValid] = useState(false);
   const genericHandler = (event) => {
@@ -68,6 +69,7 @@ function Drugs() {
             })
             genericInput.value = '';
             tradeInput.value = '';
+            FetchedDrug.push(drug);
             notifySuccess("Drug Inserted successfully ");
           } else {
             notifyFailed("There is an Error !");
@@ -87,7 +89,6 @@ function Drugs() {
       position: "top-center",
     });
   };
-
   useEffect(() => {
     axios
       .get(
@@ -97,9 +98,30 @@ function Drugs() {
         setFetchedDrug(res.data);
         setDrug({...drug, NewDrug :false});
       });
-  }, [drug.NewDrug]);
+  }, [FetchedDrug]); 
+  const deleteDrugHandler =(e)=>{
+     setDrugId({Id : e.currentTarget.getAttribute("data-value")});
+  }
+  const verifyDeletion =  (IsDeleted)=>{
+    if(drugId.Id != null){
+      if(IsDeleted){
+        axios.post("http://localhost:85/patient_system/project/patient_system_backend/DeleteDrug.php",drugId).then((res)=>{
+          if(res.data){
+            console.log(FetchedDrug);
+            FetchedDrug.pop(drugId.Id);
+            console.log(FetchedDrug);
+            notifySuccess("Drug deleted Successfully");
+          }else{
+            notifyFailed("There is an error occured !")
+          }
+        })
+      }
+    }
+  }
+  
   return (
     <div className="formContainer">
+      <Modal Content = "are you sure want to delete this drug" Title = "Delete Drug Alert" Verify={verifyDeletion} ></Modal>
       <div className="card ">
         <div className="card-header bg-white border-bottom  ">
           <h2>Drugs</h2>
@@ -156,7 +178,8 @@ function Drugs() {
         </form>
         {/* we need a search box here  */}
         <div className="card-body">
-          <div className="table-responsive">
+          {FetchedDrug.length != 0 ? (
+            <div className="table-responsive">
             <table className="table align-items-center mb-0">
               <thead>
                 <tr>
@@ -190,13 +213,12 @@ function Drugs() {
                       {drug.Trade}
                     </td>
                     <td className="text-xs font-weight-bold mb-0 text-center">
-                    <button className="btn btn-info btn-sm mb-0">
-                        <i className="fa fa-pencil"></i>
+                      <button className="btn btn-info btn-sm mb-0">
+                          <i className="fa fa-pencil"></i>
                       </button>
                     </td>
-                    {/* <td  className="text-xs font-weight-bold mb-0 text-center"><span className="badge" style={{backgroundColor:" #5cb85c"}} >Paid <i className="fa fa-check-circle mx-2"></i></span></td> */}
                     <td className="text-xs font-weight-bold mb-0 text-center">
-                      <button className="btn btn-danger btn-sm mb-0">
+                      <button className="btn btn-danger btn-sm mb-0"  data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={deleteDrugHandler} data-value={drug.Id}>
                         <i className="fa fa-trash"></i>
                       </button>
                     </td>
@@ -205,6 +227,16 @@ function Drugs() {
               </tbody>
             </table>
           </div>
+          ) : (
+            <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+                <span class="alert-icon mx-2"><i class="fa fa-warning "></i></span>
+                <span class="alert-text"><strong>Alert </strong> There is no Drug found !</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+          ) }
+          
         </div>
       </div>
       {/* we need pagination here  */}

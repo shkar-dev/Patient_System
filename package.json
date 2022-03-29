@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "homepage": "./",
+=======
+  "homepage" :"./"
+>>>>>>> d81c8d65139c2eb1d07bf8e679825fdb7a24fbb5
   "name": "patient_system",
   "version": "0.1.0",
   "private": true,

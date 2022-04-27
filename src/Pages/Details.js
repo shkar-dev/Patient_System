@@ -7,7 +7,9 @@ import { toast } from 'react-toastify';
 function Details() {
     var {id} = useParams();
     const [drugs , setDrugs]= useState([]);
-    const [patientDetails ,setPatieintDetails ] = useState([]);
+    const [patientDetails ,setPatientDetails ] = useState([ ]);
+    const [fetchedHistory ,setFetchedHistory]=useState([]);
+    const [fetchedReport ,setFetchedReport] = useState([]);
     const [history ,setHistory] = useState({
         Plan : '',
         Allergy : '',
@@ -22,11 +24,37 @@ function Details() {
     const Id = {
         Id : id
     }
-    useEffect(()=>{
-        axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchPatientDetails.php",Id).then((res)=>{
-            console.log(res.data);
-        })
+    
+     
+    useEffect(()=>{ 
+      axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchPatientById.php",Id).then((res)=>{
+        setPatientDetails(res.data);
+      })
     },[])
+    useEffect(()=>{
+      axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchedHistoryById.php",Id).then((res)=>{
+        setHistory({
+          Plan : res.data.Plan,
+          Allergy : res.data.Allergy,
+          Diagnose  : res.data.Diagnoses,
+          History : res.data.History,
+          Id:id
+        })
+      
+      })
+    },[])
+    
+    useEffect(()=>{
+      axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchReportById.php",Id).then((res)=>{
+        setFetchedReport(res.data);
+        setReport({
+          Id : id , 
+          Description : res.data.Description
+        })
+      })
+    },[])
+    
+     
     const historyHistoryHandler = (e)=>{
         setHistory((prev)=>{
             return {...prev , History : e.target.value}
@@ -87,7 +115,6 @@ function Details() {
              }
         })
     }
-
     useEffect(()=>{
       axios.get("http://localhost:85/patient_system/project/patient_system_backend/FetchDrugs.php").then((res)=>{
         setDrugs(res.data);
@@ -96,39 +123,35 @@ function Details() {
     const [selectedDrug, setSelectedDrug] =useState([ ]);
     // const [selecteDrugMeal , setSelectedDrugMeal] = useState([]);
     const multipleDrugSelectionHandler= (event , value)=>{
-      setSelectedDrug(value);
+      var today = new Date();
+      var date  = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      var increment = 0;
+      while(increment < value.length){
+        value[increment].Date = date;
+        value[increment].PatientId = id;
+        increment++;
+      }
+      setSelectedDrug(value);  
     }
-    // const drugClickHandler = (event)=>{
-     
-    //   var drugsc = selectedDrug.filter(function(value , index , arr) {
-    //     return value.Id !== event.currentTarget.getAttribute('data-value');
-    //   })
-    //   setSelectedDrug(drugsc)
-    // }
-    const drugSubmitHandler = ()=>{ 
-      // console.log(selectedDrug)
+    const drugSubmitHandler = (event)=>{
+      event.preventDefault(); 
+      axios.post("http://localhost:85/patient_system/project/patient_system_backend/NewTreatment.php",selectedDrug).then((res)=>{
+        console.log(res.data);
+      });
     }
-
     const mealHandler =(event)=>{
      var mealId = event.currentTarget.getAttribute('id');
-      // ! jyakrdnawai id aka 
-      var did = mealId.slice(4);
-      // ! babakar henani filter garan basar selected grug da ta aw id a adozinawa 
-      var drug = selectedDrug.filter(function(value , index , arr ){
+     var did = mealId.slice(4);
+     var drug = selectedDrug.filter(function(value , index , arr ){
         if(value.Id == did ){
           value.Meal = event.target.value;
         }
         return value;
       })
-      // ! zyakrdni meal bo aw object  a
-     
-      // ! zyadkrdnawai bo selected drug 
-        setSelectedDrug(drug)
-        console.log(selectedDrug)
+      setSelectedDrug(drug)
     }
-     
     
-
+      
   return (
     <>
     <div className="formContainer">
@@ -203,23 +226,23 @@ function Details() {
             <form onSubmit={historySubmitHandler}>
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">History</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='History' rows="3" onChange={historyHistoryHandler}></textarea>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='History' rows="3" onChange={historyHistoryHandler} value={history.History}  ></textarea>
                 </div>
-                <div class="form-group">
+                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">Plan</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Plan' rows="3" onChange={historyPlanHandler}></textarea>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Plan' rows="3" onChange={historyPlanHandler} value={history.Plan}></textarea>
                 </div>
-                <div class="form-group">
+              <div class="form-group">
                     <label for="exampleFormControlTextarea1">Diagnoses</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Diagnoses' rows="3" onChange={historyDiagnoseHandler}></textarea>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Diagnoses' rows="3" onChange={historyDiagnoseHandler} value={history.Diagnose }></textarea>
                 </div>
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">Allergy</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Allergy' rows="3" onChange={historyAllergyHandler}></textarea>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Allergy' rows="3" onChange={historyAllergyHandler} value={history.Allergy}></textarea>
                 </div>
                 <div className="card-footer">
                     <button  className='btn btn-dark'>Save <i className='fa fa-check mx-2' ></i></button>
-                </div>
+                </div> 
             </form>
         </div>
       </div>
@@ -245,8 +268,12 @@ function Details() {
                     />
                   </div>
                 </div>
-                 
               </div>
+              {/* <div className="row">
+                <div className="col-md-12">
+                  <textarea id="Note" cols="30" rows="10" className='form-control' placeholder='Note ... ' onBlur={noteHandler}></textarea>
+                </div>
+              </div> */}
             </div>
             <div className="card-footer">
               <button class="btn btn-dark mx-2"  >Save <i class="fa fa-check mx-2"></i> </button>
@@ -270,18 +297,19 @@ function Details() {
                       <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">
                           Meal
                       </th>
-                       
+                      <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">Date</th>
                     </tr>
                 </thead>
                 <tbody style={{textAlign : 'center'}}>
                   {selectedDrug.map((drug)=>(
-                    <tr>
+                    <tr key={drug.Id}>
                       <td>{drug.Id}</td>
                       <td>{drug.Generic}</td>
                       <td>{drug.Trade}</td>
                       <td>
-                        <input type="text"  className={'form-control'} placeholder="Meal"  id={'meal'+drug.Id} onBlur={mealHandler} />
+                        <input type="text"  className={'form-control'} placeholder="Meal"  id={'meal'+drug.Id} onChange={mealHandler} />
                       </td>
+                      <td>{drug.Date}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -289,7 +317,6 @@ function Details() {
             </div>   
           </div>
           ) : ''}
-          
       </div>
       {/* report  */}
        <div className="card">
@@ -301,7 +328,7 @@ function Details() {
                   <div className="row">
                     <div className="col-md-12W">
                       <div class="form-group">
-                          <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Report' rows="3" onChange={reportHandler}></textarea>
+                          <textarea class="form-control" id="exampleFormControlTextarea1" placeholder='Report' rows="3" onChange={reportHandler} value={report.Description}></textarea>
                       </div>
                     </div>
                   </div>
@@ -317,47 +344,4 @@ function Details() {
 }
 
 export default Details
-
-
-
-
-
-// import * as React from 'react';
-// import Checkbox from '@mui/material/Checkbox';
-// import TextField from '@mui/material/TextField';
-// import Autocomplete from '@mui/material/Autocomplete';
-// import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-// import CheckBoxIcon from '@mui/icons-material/CheckBox';
-
-// const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-// const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
-// export default function CheckboxesTags() {
-//   return (
-//     <Autocomplete
-//       multiple
-//       id="checkboxes-tags-demo"
-//       options={top100Films}
-//       disableCloseOnSelect
-//       getOptionLabel={(option) => option.title}
-//       renderOption={(props, option, { selected }) => (
-//         <li {...props}>
-//           <Checkbox
-//             icon={icon}
-//             checkedIcon={checkedIcon}
-//             style={{ marginRight: 8 }}
-//             checked={selected}
-//           />
-//           {option.title}
-//         </li>
-//       )}
-//       style={{ width: 500 }}
-//       renderInput={(params) => (
-//         <TextField {...params} label="Checkboxes" placeholder="Favorites" />
-//       )}
-//     />
-//   );
-// }
-
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
  

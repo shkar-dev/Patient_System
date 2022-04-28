@@ -10,6 +10,7 @@ function Details() {
     const [patientDetails ,setPatientDetails ] = useState([ ]);
     const [fetchedHistory ,setFetchedHistory]=useState([]);
     const [fetchedReport ,setFetchedReport] = useState([]);
+    const [visits , setVisits] = useState([]);
     const [history ,setHistory] = useState({
         Plan : '',
         Allergy : '',
@@ -25,7 +26,8 @@ function Details() {
         Id : id
     }
     
-     
+    
+  
     useEffect(()=>{ 
       axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchPatientById.php",Id).then((res)=>{
         setPatientDetails(res.data);
@@ -150,6 +152,13 @@ function Details() {
       })
       setSelectedDrug(drug)
     }
+    useEffect(()=>{
+      axios.post("http://localhost:85/patient_system/project/patient_system_backend/FetchVisitsById.php",Id).then((res)=>{
+        setVisits(res.data);
+       
+      })
+    })
+    var increment=0;
     
       
   return (
@@ -161,13 +170,13 @@ function Details() {
           <h3>Visits {id} </h3>
         </div>
         <div className="card-body">
-          {/* {Patients.length != 0  ?  ( */}
+          {visits.length != 0  ?  (
             <div className="table-responsive">
              <table className="table align-items-center mb-0">
                <thead>
                  <tr>
                    <th className="text-uppercase text-secondary text-center text-xxs font-weight-bolder opacity-7">
-                     #
+                     # 
                    </th>
                    <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">
                      Code
@@ -179,42 +188,34 @@ function Details() {
                      phone number
                    </th>
                    <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">
+                     Tests
+                   </th>
+                   <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">
                      Details
+                   </th>
+                   <th className="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7">
+                     Visits
                    </th>
                  </tr>
                </thead>
                <tbody>
-                 {/* {Patients.map((a) => (
-                   <tr key={a.Id}>
-                     <td className="text-xs font-weight-bold mb-0 text-center">
-                       {increment++}
-                     </td>
-                     <td className="text-xs font-weight-bold mb-0 text-center">
-                      {a.Id}
-                     </td>
-                     <td className="text-xs font-weight-bold mb-0 text-center">
-                       {a.FirstName +" "+a.LastName}
-                     </td>
-                     <td className="text-xs font-weight-bold mb-0 text-center">
-                       {a.PhoneNumber}
-                     </td>
-                     <td className="text-xs font-weight-bold mb-0 text-center">
-                       <button className="btn btn-info btn-sm m-0"><i className="fa fa-file"></i></button>
-                     </td>
+                 {visits.map((visit)=>(
+                   <tr>
+                    <td><h1>{visit.Id}</h1></td>
                    </tr>
-                 ))} */}
+                 ))}
                </tbody>
              </table>
            </div>
-        {/* //   ) : (
-        //     <div class="alert alert-secondary alert-dismissible fade show" role="alert">
-        //         <span class="alert-icon mx-2"><i class="fa fa-warning "></i></span>
-        //         <span class="alert-text"><strong>Alert </strong> There is no patient found !</span>
-        //         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-        //             <span aria-hidden="true">&times;</span>
-        //         </button>
-        //     </div>
-        //   ) } */}
+           ) : (
+            <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+                <span class="alert-icon mx-2"><i class="fa fa-warning "></i></span>
+                <span class="alert-text"><strong>Alert </strong> There is no patient found !</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+          ) } 
         </div>
       </div>
       {/* history */}

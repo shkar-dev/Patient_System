@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import CardHeader from "../components/CardHeader";
 import Button from "../UI/Button";
 import "./style/NewPatient.css";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
-import db from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -24,6 +22,7 @@ export default function NewPatient() {
   var BloodGroup = document.getElementById("BloodGroup");
   var PhoneNumber = document.getElementById("PhoneNumber");
   var Address = document.getElementById("Address");
+  var isPaid = document.getElementById("isPaid");
   const [BG, setBG] = useState([]);
   const [ST,setST] = useState([]);
   const [Genders ,setGender] = useState([]);
@@ -41,6 +40,7 @@ export default function NewPatient() {
     Age: "",
     PhoneNumber: "",
     Address: "",
+    isPaid :""
   };
   const [userInput, setUserInput] = useState({
     FirstName: "",
@@ -55,6 +55,7 @@ export default function NewPatient() {
     Age: "",
     PhoneNumber: "",
     Address: "",
+    isPaid :""
   });
   const [Error, setError] = useState({
     FirstName: "",
@@ -69,6 +70,7 @@ export default function NewPatient() {
     Age: "",
     PhoneNumber: "",
     Address: "",
+    isPaid : ""
   });
 
   // firstname
@@ -252,6 +254,25 @@ export default function NewPatient() {
     }
   };
 
+   // ispaid
+   const isPaidHandler = (event) => {
+    const isPaid = document.getElementById("isPaid");
+    if (isPaid.selectedIndex < 1) {
+      setError((prevState) => {
+        return { ...prevState, isPaid: "is Paid is not selected" };
+      });
+      setIsFormValid(false);
+    } else {
+      setIsFormValid(true);
+      setError((prevState) => {
+        return { ...prevState, isPaid: "" };
+      });
+      setUserInput((prevState) => {
+        return { ...prevState, isPaid: event.target.value };
+      });
+    }
+  };
+
   // bloodgroup
   const BloodGroupHandler = (event) => {
     const bloodGroup = document.getElementById("BloodGroup");
@@ -339,11 +360,12 @@ export default function NewPatient() {
     }
   };
 
-  const addToFirebase = async () => {
-    const collectionRef = collection(db, "Patients");
-    await addDoc(collectionRef, userInput);
-  };
+  // const addToFirebase = async () => {
+  //   const collectionRef = collection(db, "Patients");
+  //   await addDoc(collectionRef, userInput);
+  // };
   const SubmitFormHandler = (event) => {
+    console.log("check")
     event.preventDefault();
     // axios.get("http://localhost:85/patient_system/project/patient_system_backend/Connection.php").then((res)=>{console.log(res.data)})
     if (IsFormValid) {
@@ -353,13 +375,22 @@ export default function NewPatient() {
           userInput
         )
         .then((res) => {
-          if(res.data ==true){
-            notifySuccess("Patient Information inserted Succesfully " );
-          }else{
-            notifyError("there is an error please try again  !!!"+res.data);
+          // if(res.data ==true){
+          //   notifySuccess("Patient Information inserted Succesfully " );
+          // }else{
+          //   notifyError("there is an error please try again  !!!"+res.data);
+          // }
+          // console.log(res.data);
+          var lastId=  res.data;
+          var data = {
+            id :lastId,
+            isPaid: userInput.isPaid
           }
+          axios.post("http://localhost:85/patient_system/project/patient_system_backend/InsertVisit.php",data ).then((res)=>{
+            console.log(res.data );
+          })
         });
-      addToFirebase();
+      // addToFirebase();
       setUserInput({
         FirstName: "",
         LastName: "",
@@ -695,6 +726,37 @@ export default function NewPatient() {
                 </div>
                 <label>{Error.Address.length > 0 ? Error.Address : ""}</label>
               </div>
+              
+
+
+
+              <div className="col-md-4 px-2 ">
+                <label>Is Paid ? </label>
+                <div
+                  className={`form-group  ${
+                    Error.isPaid.length === 0 ? "" : " has-danger"
+                  }`}
+                >
+                  <select
+                    className={`form-control  ${
+                      Error.isPaid.length > 0 ? "is-invalid" : ""
+                    }`}
+                    id="isPaid"
+                    onBlur={isPaidHandler}
+                  >
+                    <option disabled selected>
+                      None
+                    </option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                  </select>
+                </div>
+                <label>{Error.isPaid.length > 0 ? Error.isPaid : ""}</label>
+              </div>
+
+
+
+
 
               <div className="col-md-4 px-2 ">
                 <label>Old Patinet CVs</label>

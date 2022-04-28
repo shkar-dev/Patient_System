@@ -1,4 +1,5 @@
 import "./style/TodaysPatient.css";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, QuerySnapshot } from "firebase/firestore";
 import axios from "axios";
@@ -67,7 +68,9 @@ function TodaysPatient() {
                        {a.PhoneNumber}
                      </td>
                      <td className="text-xs font-weight-bold mb-0 text-center">
-                       <button className="btn btn-info btn-sm m-0"><i className="fa fa-calendar"></i></button>
+                       <Link to={'/Details/'+a.Id} >
+                        <button className="btn btn-info btn-sm m-0"><i className="fa fa-file"></i></button>
+                       </Link>
                      </td>
                    </tr>
                  ))}
